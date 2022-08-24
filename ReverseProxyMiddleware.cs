@@ -51,14 +51,12 @@ public class ReverseProxyMiddleware
                 m_logger?.LogInformation("Received Status Code {StatusCode}", context.Response.StatusCode);
             }
 
-            foreach (var header in response.Headers.Where(h => AllowedHeaders.Contains(h.Key, StringComparer.OrdinalIgnoreCase)))
+            foreach (var header in response.Headers.Where(h => Constants.AllowedResponseHeaders.Contains(h.Key, StringComparer.OrdinalIgnoreCase)))
             {
                 TryAddHeader(context.Response, header, ref lastHeaderKey);
             }
 
             var peekResponseBody = await response.Content.ReadAsStringAsync();
-            Console.WriteLine($"Received Body: {peekResponseBody}");
-            Debug.WriteLine($"Received Body: {peekResponseBody}");
             m_logger?.LogInformation("Received body: {Body}", peekResponseBody);
             await context.Response.WriteAsync(peekResponseBody);
         }
@@ -68,5 +66,18 @@ public class ReverseProxyMiddleware
             context.Response.StatusCode = 500;
             await context.Response.WriteAsJsonAsync(new Error(ex.Message));
         }
+    }
+
+    private static void TryAddHeader(HttpResponse response, KeyValuePair<string, IEnumerable<string>> header, ref string lastHeaderKey)
+    {
+        try
+        {
+            lastHeaderKey = header.Key;
+            response.Headers.TryAdd(header.Key, header.Value.ToArray());
+        }
+        catch
+        {
+            Console.WriteLine("Can't put this header into the response: {HeaderName}", header.Key);
+        } 
     }
 }
