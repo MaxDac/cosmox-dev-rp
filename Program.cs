@@ -5,12 +5,6 @@ using CosmosDbLocalReverseProxy;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddHttpClient<ReverseProxyClient>();
-builder.Services.AddLogging(builder => 
-{
-    builder.AddConsole();
-    builder.AddDebug();
-    builder.AddSimpleConsole();
-});
 
 var app = builder.Build();
 
@@ -71,6 +65,12 @@ app.Use(async (HttpContext context, Func<Task> _next) =>
 
     var client = app.Services.GetService<ReverseProxyClient>();
     var logger = app.Services.GetService<ILogger>();
+    
+    if (logger is null)
+    {
+        Console.WriteLine("The logger is null");
+    }
+
     var lastHeaderKey = "";
 
     if (client is null)
