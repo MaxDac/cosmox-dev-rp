@@ -7,7 +7,9 @@ public static class Constants
         "authorization",
         "x-ms-date",
         "x-ms-version",
-        "x-ms-offer-throughput"
+        "x-ms-offer-throughput",
+        "x-ms-version",
+        "x-ms-documentdb-partitionkey"
     };
 
     public static string[] AllowedResponseHeaders = new[] {
