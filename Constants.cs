@@ -9,7 +9,10 @@ public static class Constants
         "x-ms-version",
         "x-ms-offer-throughput",
         "x-ms-version",
-        "x-ms-documentdb-partitionkey"
+        "x-ms-documentdb-partitionkey",
+        "x-ms-documentdb-isquery",
+        "x-ms-documentdb-query-enablecrosspartition",
+        "x-ms-max-item-count"
     };
 
     public static string[] AllowedResponseHeaders = new[] {

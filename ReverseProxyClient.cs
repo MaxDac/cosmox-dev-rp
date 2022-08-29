@@ -7,6 +7,7 @@ public class ReverseProxyClient
 {
 
     private static Uri RelayServerHost = new Uri("https://localhost:8081");
+    private const string QueryContentType = "application/query+json";
 
     private readonly HttpClient m_client;
     private readonly ILogger<ReverseProxyClient> m_logger;
@@ -28,8 +29,20 @@ public class ReverseProxyClient
             using var reader = new StreamReader(request.Body);
             var requestBody = await reader.ReadToEndAsync();
             m_logger.LogInformation("Request contains body: {Body}", requestBody);
-            relayedRequest.Content = new StringContent(requestBody, Encoding.UTF8, "application/json");
+            var contentType = request.Headers.ContentType;
+            relayedRequest.Content = new StringContent(requestBody, Encoding.UTF8, contentType);
+            
+            if (contentType == QueryContentType)
+            {
+                // Important for the query requests.
+                relayedRequest.Content.Headers!.ContentType!.CharSet = "";
+            }
         }
+
+        var headers = string.Join("\r\n", request.Headers
+            .Select(h => $"{h.Key} - {h.Value}"));
+
+        m_logger.LogInformation("Request headers: {Headers}", headers);
 
         foreach (var header in request.Headers.Where(h => Constants.AllowedRequestHeaders.Contains(h.Key, StringComparer.OrdinalIgnoreCase)))
         {
